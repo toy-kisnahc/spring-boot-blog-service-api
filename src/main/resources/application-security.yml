@@ -1,8 +1,0 @@
-spring:
-  jwt:
-    secret: blog-service-jwt-secretKey-access
-  data:
-    redis:
-      host: localhost
-      port: 6379
-
