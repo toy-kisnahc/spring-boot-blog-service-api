@@ -12,6 +12,10 @@ public class MemberNotFoundException extends BlogApplicationException{
         addErrorField(fieldName, rejectValue);
     }
 
+    public MemberNotFoundException() {
+        super(MESSAGE);
+    }
+
     @Override
     public int statusCode() {
         return 404;

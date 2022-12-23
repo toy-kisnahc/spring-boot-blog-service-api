@@ -6,6 +6,7 @@ import com.kisnahc.blogservice.domain.Member;
 import com.kisnahc.blogservice.domain.Role;
 import com.kisnahc.blogservice.dto.reqeust.CreateMemberRequest;
 import com.kisnahc.blogservice.dto.reqeust.LoginMemberRequest;
+import com.kisnahc.blogservice.dto.reqeust.UpdateMemberRequest;
 import com.kisnahc.blogservice.dto.response.LoginMemberResponse;
 import com.kisnahc.blogservice.exception.member.DuplicateEmailException;
 import com.kisnahc.blogservice.exception.member.DuplicateNicknameException;
@@ -43,7 +44,7 @@ class MemberControllerTest {
 
     @Test
     void create_member_test_success() throws Exception {
-        CreateMemberRequest member = getCreateMemberReqeust("memberA@gmail.com", "memberA", "MemberA123!");
+        CreateMemberRequest member = getCreateMemberRequest("memberA@gmail.com", "memberA", "MemberA123!");
         String body = toBody(member);
 
         mockMvc.perform(post("/api/auth/sign-up")
@@ -55,7 +56,7 @@ class MemberControllerTest {
 
     @Test
     void validate_email_create_member_test() throws Exception {
-        CreateMemberRequest member = getCreateMemberReqeust("memberAgmail.com", "memberA", "MemberA123!");
+        CreateMemberRequest member = getCreateMemberRequest("memberAgmail.com", "memberA", "MemberA123!");
         String body = toBody(member);
 
         mockMvc.perform(post("/api/auth/sign-up")
@@ -72,7 +73,7 @@ class MemberControllerTest {
 
     @Test
     void validate_nickname_create_member_test() throws Exception {
-        CreateMemberRequest member = getCreateMemberReqeust("memberA@gmail.com", "A", "MemberA123!");
+        CreateMemberRequest member = getCreateMemberRequest("memberA@gmail.com", "A", "MemberA123!");
         String body = toBody(member);
 
         mockMvc.perform(post("/api/auth/sign-up")
@@ -92,7 +93,7 @@ class MemberControllerTest {
         /*
             password -> 영문(대, 소문자), 숫자, 특수문자를 포함한 8자 이상 20자 이하.
          */
-        CreateMemberRequest member = getCreateMemberReqeust("memberA@gmail.com", "memberA", "member1234");
+        CreateMemberRequest member = getCreateMemberRequest("memberA@gmail.com", "memberA", "member1234");
         String body = toBody(member);
 
         mockMvc.perform(post("/api/auth/sign-up")
@@ -109,7 +110,7 @@ class MemberControllerTest {
 
     @Test
     void validate_duplicate_nickname_create_member_test() throws Exception {
-        CreateMemberRequest member = getCreateMemberReqeust("memberA@gmail.com", "memberA", "member1234!");
+        CreateMemberRequest member = getCreateMemberRequest("memberA@gmail.com", "memberA", "member1234!");
         String bodyA = toBody(member);
 
         mockMvc.perform(post("/api/auth/sign-up")
@@ -118,7 +119,7 @@ class MemberControllerTest {
                 .andExpect(status().isCreated())
                 .andDo(print());
 
-        CreateMemberRequest duplicateNicknameMember = getCreateMemberReqeust("memberB@gmail.com", "memberA", "member1234!");
+        CreateMemberRequest duplicateNicknameMember = getCreateMemberRequest("memberB@gmail.com", "memberA", "member1234!");
         String bodyB = toBody(duplicateNicknameMember);
 
         mockMvc.perform(post("/api/auth/sign-up")
@@ -132,8 +133,8 @@ class MemberControllerTest {
 
     @Test
     void validate_duplicate_email_create_member_test() throws Exception {
-        CreateMemberRequest memberA = getCreateMemberReqeust("memberA@gmail.com", "memberA", "member1234!");
-        CreateMemberRequest memberB = getCreateMemberReqeust("memberA@gmail.com", "memberB", "member1234!");
+        CreateMemberRequest memberA = getCreateMemberRequest("memberA@gmail.com", "memberA", "member1234!");
+        CreateMemberRequest memberB = getCreateMemberRequest("memberA@gmail.com", "memberB", "member1234!");
 
         String bodyA = toBody(memberA);
         String bodyB = toBody(memberB);
@@ -156,10 +157,8 @@ class MemberControllerTest {
     @Test
     void login_member_test() throws Exception {
         // 회원 가입.
-        CreateMemberRequest memberA = getCreateMemberReqeust("memberA@gmail.com", "memberA", "member1234!");
-
+        CreateMemberRequest memberA = getCreateMemberRequest("memberA@gmail.com", "memberA", "member1234!");
         String createRequestBody = toBody(memberA);
-
         mockMvc.perform(post("/api/auth/sign-up")
                         .content(createRequestBody)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -193,10 +192,8 @@ class MemberControllerTest {
     @Test
     void authentication_member_test() throws Exception {
         // 회원 가입.
-        CreateMemberRequest memberA = getCreateMemberReqeust("memberA@gmail.com", "memberA", "member1234!");
-
+        CreateMemberRequest memberA = getCreateMemberRequest("memberA@gmail.com", "memberA", "member1234!");
         String createRequestBody = toBody(memberA);
-
         mockMvc.perform(post("/api/auth/sign-up")
                         .content(createRequestBody)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -205,9 +202,7 @@ class MemberControllerTest {
 
         // 로그인.
         LoginMemberRequest loginRequest = getLoginMemberRequest("memberA@gmail.com", "member1234!");
-
         String loginRequestBody = toBody(loginRequest);
-
         MvcResult mvcResult = mockMvc.perform(post("/api/auth/sign-in")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loginRequestBody))
@@ -223,12 +218,10 @@ class MemberControllerTest {
     }
 
     @Test
-    void authorization_fail_member_test() throws Exception {
+    void authorization_member_test_fail() throws Exception {
         // 회원 가입.
-        CreateMemberRequest memberA = getCreateMemberReqeust("memberA@gmail.com", "memberA", "member1234!");
-
+        CreateMemberRequest memberA = getCreateMemberRequest("memberA@gmail.com", "memberA", "member1234!");
         String createRequestBody = toBody(memberA);
-
         mockMvc.perform(post("/api/auth/sign-up")
                         .content(createRequestBody)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -238,9 +231,7 @@ class MemberControllerTest {
 
         // 로그인.
         LoginMemberRequest loginRequest = getLoginMemberRequest(memberA.getEmail(), memberA.getPassword());
-
         String loginRequestBody = toBody(loginRequest);
-
         MvcResult mvcResult = mockMvc.perform(post("/api/auth/sign-in")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loginRequestBody))
@@ -264,12 +255,10 @@ class MemberControllerTest {
     }
 
     @Test
-    void authorization_success_member_test() throws Exception {
+    void authorization_member_test_success() throws Exception {
         // 회원 가입.
-        CreateMemberRequest memberA = getCreateMemberReqeust("memberA@gmail.com", "memberA", "member1234!");
-
+        CreateMemberRequest memberA = getCreateMemberRequest("memberA@gmail.com", "memberA", "member1234!");
         String createRequestBody = toBody(memberA);
-
         mockMvc.perform(post("/api/auth/sign-up")
                         .content(createRequestBody)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -279,9 +268,7 @@ class MemberControllerTest {
 
         // 로그인.
         LoginMemberRequest loginRequest = getLoginMemberRequest(memberA.getEmail(), memberA.getPassword());
-
         String loginRequestBody = toBody(loginRequest);
-
         MvcResult mvcResult = mockMvc.perform(post("/api/auth/sign-in")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loginRequestBody))
@@ -294,6 +281,46 @@ class MemberControllerTest {
         LoginMemberResponse loginMemberResponse = toObject(mvcResult, LoginMemberResponse.class);
         mockMvc.perform(get("/api/auth/test").header("Authorization", "Bearer " + loginMemberResponse.getJwt()))
                 .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    void update_member_test_success() throws Exception {
+        // 회원 가입.
+        CreateMemberRequest memberA = getCreateMemberRequest("memberA@gmail.com", "memberA", "member1234!");
+        String createRequestBody = toBody(memberA);
+        mockMvc.perform(post("/api/auth/sign-up")
+                        .content(createRequestBody)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(print());
+
+
+        // 로그인.
+        LoginMemberRequest loginRequest = getLoginMemberRequest(memberA.getEmail(), memberA.getPassword());
+        String loginRequestBody = toBody(loginRequest);
+        MvcResult mvcResult = mockMvc.perform(post("/api/auth/sign-in")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestBody))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
+
+        LoginMemberResponse loginMemberResponse = toObject(mvcResult, LoginMemberResponse.class);
+
+        Member member = memberRepository.findByEmail(loginRequest.getEmail()).get();
+
+        // 회원 정보 수정.
+        UpdateMemberRequest updateMemberRequest = getUpdateMemberRequest("updatedNickname");
+        String body = toBody(updateMemberRequest);
+
+        mockMvc.perform(patch("/api/members/{memberId}", member.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .header("Authorization", "Bearer " + loginMemberResponse.getJwt()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.memberId").value(member.getId()))
+                .andExpect(jsonPath("$.updatedNickname").value(updateMemberRequest.getNickname()))
                 .andDo(print());
     }
 
@@ -311,7 +338,7 @@ class MemberControllerTest {
 
 
     /* dto */
-    private CreateMemberRequest getCreateMemberReqeust(String email, String nickname, String password) {
+    private CreateMemberRequest getCreateMemberRequest(String email, String nickname, String password) {
         CreateMemberRequest createMemberRequest = new CreateMemberRequest();
         createMemberRequest.setEmail(email);
         createMemberRequest.setNickname(nickname);
@@ -324,6 +351,12 @@ class MemberControllerTest {
         loginMemberRequest.setEmail(email);
         loginMemberRequest.setPassword(password);
         return loginMemberRequest;
+    }
+
+    private UpdateMemberRequest getUpdateMemberRequest(String nickname) {
+        UpdateMemberRequest updateMemberRequest = new UpdateMemberRequest();
+        updateMemberRequest.setNickname(nickname);
+        return updateMemberRequest;
     }
 
 }
