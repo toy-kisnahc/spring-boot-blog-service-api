@@ -5,10 +5,7 @@ import com.kisnahc.blogservice.dto.reqeust.LoginMemberRequest;
 import com.kisnahc.blogservice.dto.reqeust.CreateMemberRequest;
 import com.kisnahc.blogservice.dto.reqeust.LogoutMemberRequest;
 import com.kisnahc.blogservice.dto.reqeust.UpdateMemberRequest;
-import com.kisnahc.blogservice.dto.response.CreateMemberResponse;
-import com.kisnahc.blogservice.dto.response.LoginMemberResponse;
-import com.kisnahc.blogservice.dto.response.LogoutMemberResponse;
-import com.kisnahc.blogservice.dto.response.UpdateMemberResponse;
+import com.kisnahc.blogservice.dto.response.*;
 import com.kisnahc.blogservice.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -47,9 +44,18 @@ public class MemberController {
 
     @PreAuthorize("#memberId == #memberAdapter.member.id")
     @PatchMapping("/api/members/{memberId}")
-    public ResponseEntity<UpdateMemberResponse> updateMember(@PathVariable Long memberId, @RequestBody @Valid UpdateMemberRequest request, @AuthenticationPrincipal MemberAdapter memberAdapter) {
-        log.info("member = {}", memberAdapter.getMember().getId());
+    public ResponseEntity<UpdateMemberResponse> updateMember(@PathVariable Long memberId,
+                                                             @RequestBody @Valid UpdateMemberRequest request,
+                                                             @AuthenticationPrincipal MemberAdapter memberAdapter) {
         UpdateMemberResponse memberResponse = memberService.update(memberId, request);
+        return new ResponseEntity<>(memberResponse, HttpStatus.OK);
+    }
+
+    @PreAuthorize("#memberId == #memberAdapter.member.id")
+    @DeleteMapping("/api/members/{memberId}")
+    public ResponseEntity<DeleteMemberResponse> deleteMember(@PathVariable Long memberId,
+                                                             @AuthenticationPrincipal MemberAdapter memberAdapter) {
+        DeleteMemberResponse memberResponse = memberService.delete(memberId);
         return new ResponseEntity<>(memberResponse, HttpStatus.OK);
     }
 

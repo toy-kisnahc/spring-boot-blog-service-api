@@ -6,11 +6,8 @@ import com.kisnahc.blogservice.domain.Role;
 import com.kisnahc.blogservice.dto.reqeust.LoginMemberRequest;
 import com.kisnahc.blogservice.dto.reqeust.LogoutMemberRequest;
 import com.kisnahc.blogservice.dto.reqeust.UpdateMemberRequest;
-import com.kisnahc.blogservice.dto.response.LoginMemberResponse;
+import com.kisnahc.blogservice.dto.response.*;
 import com.kisnahc.blogservice.dto.reqeust.CreateMemberRequest;
-import com.kisnahc.blogservice.dto.response.CreateMemberResponse;
-import com.kisnahc.blogservice.dto.response.LogoutMemberResponse;
-import com.kisnahc.blogservice.dto.response.UpdateMemberResponse;
 import com.kisnahc.blogservice.exception.member.MemberNotFoundException;
 import com.kisnahc.blogservice.repository.MemberRepository;
 import com.kisnahc.blogservice.util.BlogValidator;
@@ -76,6 +73,14 @@ public class MemberService {
         member.updateMember(request.getNickname());
 
         return new UpdateMemberResponse(member);
+    }
+
+    @Transactional
+    public DeleteMemberResponse delete(Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(MemberNotFoundException::new);
+        memberRepository.delete(member);
+
+        return new DeleteMemberResponse(member);
     }
 
     private Duration getExpirationSeconds(String jwt) {
