@@ -16,6 +16,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -57,6 +59,18 @@ public class MemberController {
                                                              @AuthenticationPrincipal MemberAdapter memberAdapter) {
         DeleteMemberResponse memberResponse = memberService.delete(memberId);
         return new ResponseEntity<>(memberResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/api/members/{memberId}")
+    public ResponseEntity<MemberResponse> findMember(@PathVariable Long memberId) {
+        MemberResponse memberResponse = memberService.findMember(memberId);
+        return new ResponseEntity<>(memberResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/api/members")
+    public ResponseEntity<List<MemberResponse>> findMembers() {
+        List<MemberResponse> memberResponses = memberService.findMembers();
+        return new ResponseEntity<>(memberResponses, HttpStatus.OK);
     }
 
     @GetMapping("/api/auth/test")

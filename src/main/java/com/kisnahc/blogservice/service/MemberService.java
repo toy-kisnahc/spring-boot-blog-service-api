@@ -21,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Transactional(readOnly = true)
@@ -42,7 +44,7 @@ public class MemberService {
                 .email(request.getEmail())
                 .nickname(request.getNickname())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.ROLE_ADMIN)
+                .role(Role.ROLE_MEMBER)
                 .build();
 
         Member savedMember = memberRepository.save(member);
@@ -83,6 +85,19 @@ public class MemberService {
         return new DeleteMemberResponse(member);
     }
 
+    public MemberResponse findMember(Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(MemberNotFoundException::new);
+
+        return new MemberResponse(member);
+    }
+
+    public List<MemberResponse> findMembers() {
+        List<Member> members = memberRepository.findAll();
+
+        return members.stream()
+                .map(MemberResponse::new)
+                .collect(Collectors.toList());
+    }
     private Duration getExpirationSeconds(String jwt) {
         long expirationTime = jwtProvider.getExpiration(jwt).getTime();
 

@@ -11,6 +11,7 @@ import com.kisnahc.blogservice.dto.response.LoginMemberResponse;
 import com.kisnahc.blogservice.exception.member.DuplicateEmailException;
 import com.kisnahc.blogservice.exception.member.DuplicateNicknameException;
 import com.kisnahc.blogservice.repository.MemberRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -22,9 +23,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.hasValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -44,19 +46,13 @@ class MemberControllerTest {
 
     @Test
     void create_member_test_success() throws Exception {
-        CreateMemberRequest member = getCreateMemberRequest("memberA@gmail.com", "memberA", "MemberA123!");
-        String body = toBody(member);
-
-        mockMvc.perform(post("/api/auth/sign-up")
-                        .content(body)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andDo(print());
+        createMember("memberA@gmail.com", "memberA", "MemberA123!");
     }
 
     @Test
     void validate_email_create_member_test() throws Exception {
         CreateMemberRequest member = getCreateMemberRequest("memberAgmail.com", "memberA", "MemberA123!");
+
         String body = toBody(member);
 
         mockMvc.perform(post("/api/auth/sign-up")
@@ -110,15 +106,7 @@ class MemberControllerTest {
 
     @Test
     void validate_duplicate_nickname_create_member_test() throws Exception {
-        CreateMemberRequest member = getCreateMemberRequest("memberA@gmail.com", "memberA", "member1234!");
-        String bodyA = toBody(member);
-
-        mockMvc.perform(post("/api/auth/sign-up")
-                        .content(bodyA)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andDo(print());
-
+        createMember("memberA@gmail.com", "memberA", "member1234!");
         CreateMemberRequest duplicateNicknameMember = getCreateMemberRequest("memberB@gmail.com", "memberA", "member1234!");
         String bodyB = toBody(duplicateNicknameMember);
 
@@ -157,13 +145,7 @@ class MemberControllerTest {
     @Test
     void login_member_test() throws Exception {
         // 회원 가입.
-        CreateMemberRequest memberA = getCreateMemberRequest("memberA@gmail.com", "memberA", "member1234!");
-        String createRequestBody = toBody(memberA);
-        mockMvc.perform(post("/api/auth/sign-up")
-                        .content(createRequestBody)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andDo(print());
+        createMember("memberA@gmail.com", "memberA", "member1234!");
 
         // 로그인.
         LoginMemberRequest loginRequest = getLoginMemberRequest("memberA@gmail.com", "member1234!");
@@ -192,13 +174,7 @@ class MemberControllerTest {
     @Test
     void authentication_member_test() throws Exception {
         // 회원 가입.
-        CreateMemberRequest memberA = getCreateMemberRequest("memberA@gmail.com", "memberA", "member1234!");
-        String createRequestBody = toBody(memberA);
-        mockMvc.perform(post("/api/auth/sign-up")
-                        .content(createRequestBody)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andDo(print());
+        createMember("memberA@gmail.com", "memberA", "member1234!");
 
         // 로그인.
         LoginMemberRequest loginRequest = getLoginMemberRequest("memberA@gmail.com", "member1234!");
@@ -220,14 +196,7 @@ class MemberControllerTest {
     @Test
     void authorization_member_test_fail() throws Exception {
         // 회원 가입.
-        CreateMemberRequest memberA = getCreateMemberRequest("memberA@gmail.com", "memberA", "member1234!");
-        String createRequestBody = toBody(memberA);
-        mockMvc.perform(post("/api/auth/sign-up")
-                        .content(createRequestBody)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andDo(print());
-
+        CreateMemberRequest memberA = createMember( "memberA@gmail.com", "memberA", "member1234!");
 
         // 로그인.
         LoginMemberRequest loginRequest = getLoginMemberRequest(memberA.getEmail(), memberA.getPassword());
@@ -242,9 +211,9 @@ class MemberControllerTest {
 
         Member member = memberRepository.findByEmail(loginRequest.getEmail()).get();
 
-        member.setRole(Role.ROLE_MEMBER); // 권한 병경 -> ADMIN to MEMBER
+        member.setRole(Role.ROLE_MANAGER); // 권한 변경 -> MEMBER to MANAGER
 
-        // ADMIN 접근 가능 .
+        // MEMBER 접근 가능 .
         LoginMemberResponse loginMemberResponse = toObject(mvcResult, LoginMemberResponse.class);
         mockMvc.perform(get("/api/auth/test").header("Authorization", "Bearer " + loginMemberResponse.getJwt()))
                 .andExpect(status().isForbidden())
@@ -257,14 +226,7 @@ class MemberControllerTest {
     @Test
     void authorization_member_test_success() throws Exception {
         // 회원 가입.
-        CreateMemberRequest memberA = getCreateMemberRequest("memberA@gmail.com", "memberA", "member1234!");
-        String createRequestBody = toBody(memberA);
-        mockMvc.perform(post("/api/auth/sign-up")
-                        .content(createRequestBody)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andDo(print());
-
+        CreateMemberRequest memberA = createMember("memberA@gmail.com", "memberA", "member1234!");
 
         // 로그인.
         LoginMemberRequest loginRequest = getLoginMemberRequest(memberA.getEmail(), memberA.getPassword());
@@ -277,7 +239,7 @@ class MemberControllerTest {
                 .andReturn();
 
 
-        // ADMIN 접근 가능 .
+        // MEMBER 접근 가능.
         LoginMemberResponse loginMemberResponse = toObject(mvcResult, LoginMemberResponse.class);
         mockMvc.perform(get("/api/auth/test").header("Authorization", "Bearer " + loginMemberResponse.getJwt()))
                 .andExpect(status().isOk())
@@ -287,14 +249,7 @@ class MemberControllerTest {
     @Test
     void update_member_test_success() throws Exception {
         // 회원 가입.
-        CreateMemberRequest memberA = getCreateMemberRequest("memberA@gmail.com", "memberA", "member1234!");
-        String createRequestBody = toBody(memberA);
-        mockMvc.perform(post("/api/auth/sign-up")
-                        .content(createRequestBody)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andDo(print());
-
+        CreateMemberRequest memberA = createMember("memberA@gmail.com", "memberA", "member1234!");
 
         // 로그인.
         LoginMemberRequest loginRequest = getLoginMemberRequest(memberA.getEmail(), memberA.getPassword());
@@ -324,6 +279,67 @@ class MemberControllerTest {
                 .andDo(print());
     }
 
+    @Test
+    void find_member_test() throws Exception{
+        // 회원 가입.
+        CreateMemberRequest memberA = createMember("memberA@gmail.com", "memberA", "member1234!");
+
+        // 로그인.
+        LoginMemberRequest loginRequest = getLoginMemberRequest(memberA.getEmail(), memberA.getPassword());
+        String loginRequestBody = toBody(loginRequest);
+        MvcResult mvcResult = mockMvc.perform(post("/api/auth/sign-in")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestBody))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
+
+        LoginMemberResponse loginMemberResponse = toObject(mvcResult, LoginMemberResponse.class);
+
+        Member member = memberRepository.findByEmail(loginRequest.getEmail()).get();
+
+        //회원 조회.
+        mockMvc.perform(get("/api/members/{memberId}", member.getId())
+                        .header("Authorization", "Bearer " + loginMemberResponse.getJwt()))
+                .andExpect(jsonPath("$.memberId").value(member.getId()))
+                .andExpect(jsonPath("$.email").value(member.getEmail()))
+                .andExpect(jsonPath("$.nickname").value(member.getNickname()))
+                .andExpect(jsonPath("$.role").value(member.getRole().toString()))
+                .andExpect(jsonPath("$.createdDate").value(member.getCreatedDate().toString()))
+                .andExpect(jsonPath("$.updatedDate").value(member.getUpdatedDate().toString()))
+                .andDo(print());
+    }
+
+    @Test
+    void find_members_test() throws Exception{
+        // 10명 회원 가입.
+        List<CreateMemberRequest> createMembers = new ArrayList<>();
+        for (int i = 1; i < 10; i++) {
+            createMembers.add(createMember("member" + i + "@gmail.com", "member" + i, "member1234!"));
+        }
+
+        // 로그인.
+        LoginMemberRequest loginRequest = getLoginMemberRequest(createMembers.get(0).getEmail(), createMembers.get(0).getPassword());
+        String loginRequestBody = toBody(loginRequest);
+        MvcResult mvcResult = mockMvc.perform(post("/api/auth/sign-in")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestBody))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
+
+        LoginMemberResponse loginMemberResponse = toObject(mvcResult, LoginMemberResponse.class);
+
+        //회원 조회.
+        mockMvc.perform(get("/api/members")
+                        .header("Authorization", "Bearer " + loginMemberResponse.getJwt()))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        List<Member> members = memberRepository.findAll();
+        Assertions.assertThat(createMembers.size()).isEqualTo(members.size());
+    }
+
     /* util */
     private String toBody(Object member) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -334,6 +350,17 @@ class MemberControllerTest {
         String content = mvcResult.getResponse().getContentAsString();
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.readValue(content, resultObject);
+    }
+
+    private CreateMemberRequest createMember(String email, String nickname, String password) throws Exception {
+        CreateMemberRequest memberA = getCreateMemberRequest(email, nickname, password);
+        String createRequestBody = toBody(memberA);
+        mockMvc.perform(post("/api/auth/sign-up")
+                        .content(createRequestBody)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andDo(print());
+        return memberA;
     }
 
 
