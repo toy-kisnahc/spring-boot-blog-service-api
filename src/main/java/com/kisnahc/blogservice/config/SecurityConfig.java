@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests()
                 .requestMatchers(PERMIT_URL).permitAll()
-                .anyRequest().hasRole("ADMIN")
+                .anyRequest().hasRole("MEMBER")
 
                 .and()
                 .addFilterBefore(new CustomAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
