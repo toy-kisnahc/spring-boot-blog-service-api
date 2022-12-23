@@ -2,7 +2,6 @@ package com.kisnahc.blogservice.exception.member;
 
 import com.kisnahc.blogservice.exception.BlogApplicationException;
 
-
 public class MemberNotFoundException extends BlogApplicationException{
 
     private static final String MESSAGE = "member not found";
