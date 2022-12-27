@@ -3,11 +3,8 @@ package com.kisnahc.blogservice.service;
 import com.kisnahc.blogservice.auth.provider.JwtProvider;
 import com.kisnahc.blogservice.domain.Member;
 import com.kisnahc.blogservice.domain.Role;
-import com.kisnahc.blogservice.dto.reqeust.LoginMemberRequest;
-import com.kisnahc.blogservice.dto.reqeust.LogoutMemberRequest;
-import com.kisnahc.blogservice.dto.reqeust.UpdateMemberRequest;
+import com.kisnahc.blogservice.dto.reqeust.*;
 import com.kisnahc.blogservice.dto.response.*;
-import com.kisnahc.blogservice.dto.reqeust.CreateMemberRequest;
 import com.kisnahc.blogservice.exception.member.MemberNotFoundException;
 import com.kisnahc.blogservice.repository.MemberRepository;
 import com.kisnahc.blogservice.util.BlogValidator;
@@ -22,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Transactional(readOnly = true)
@@ -91,12 +87,16 @@ public class MemberService {
         return new MemberResponse(member);
     }
 
-    public List<MemberResponse> findMembers() {
-        List<Member> members = memberRepository.findAll();
+//    public List<MemberResponse> findMembers() {
+//        List<Member> members = memberRepository.findAll();
+//
+//        return members.stream()
+//                .map(MemberResponse::new)
+//                .collect(Collectors.toList());
+//    }
 
-        return members.stream()
-                .map(MemberResponse::new)
-                .collect(Collectors.toList());
+    public List<MemberResponse> findMembers(MemberSearchRequest memberSearchRequest) {
+        return memberRepository.getMembers(memberSearchRequest);
     }
     private Duration getExpirationSeconds(String jwt) {
         long expirationTime = jwtProvider.getExpiration(jwt).getTime();

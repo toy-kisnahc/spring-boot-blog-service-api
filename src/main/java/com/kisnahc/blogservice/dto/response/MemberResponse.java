@@ -2,6 +2,7 @@ package com.kisnahc.blogservice.dto.response;
 
 import com.kisnahc.blogservice.domain.Member;
 import com.kisnahc.blogservice.domain.Role;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -18,6 +19,7 @@ public class MemberResponse {
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
 
+    @QueryProjection
     public MemberResponse(Member member) {
         this.memberId = member.getId();
         this.email = member.getEmail();
