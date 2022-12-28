@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,7 +29,7 @@ public class MemberSearchRequest {
     private Direction direction;
 
     public long getOffset() {
-        return (long) (Math.max(1, page) - 1) * Math.min(size, MAX_SIZE);
+        return (long) (max(1, page) - 1) * min(size, MAX_SIZE);
     }
 
     public Sort getSort() {
