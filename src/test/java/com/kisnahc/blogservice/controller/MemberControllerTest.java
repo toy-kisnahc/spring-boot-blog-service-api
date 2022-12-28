@@ -6,15 +6,20 @@ import com.kisnahc.blogservice.domain.Member;
 import com.kisnahc.blogservice.domain.Role;
 import com.kisnahc.blogservice.dto.reqeust.CreateMemberRequest;
 import com.kisnahc.blogservice.dto.reqeust.LoginMemberRequest;
+import com.kisnahc.blogservice.dto.reqeust.MemberSearchRequest;
 import com.kisnahc.blogservice.dto.reqeust.UpdateMemberRequest;
 import com.kisnahc.blogservice.dto.response.LoginMemberResponse;
 import com.kisnahc.blogservice.exception.member.DuplicateEmailException;
 import com.kisnahc.blogservice.exception.member.DuplicateNicknameException;
 import com.kisnahc.blogservice.repository.MemberRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -38,12 +43,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 class MemberControllerTest {
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @AfterEach
+    void init() {
+        memberRepository.deleteAll();
+        this.entityManager
+                .createNativeQuery("ALTER TABLE member ALTER COLUMN `id` RESTART WITH 1")
+                .executeUpdate();
+    }
 
 
     @Test
@@ -313,10 +329,10 @@ class MemberControllerTest {
     }
 
     @Test
-    void find_member_dynamic_sorting_test() throws Exception{
-        // 200명 회원 가입.
+    void find_members_dynamic_sorting_test() throws Exception{
+        // 10명 회원 가입.
         List<Member> members = new ArrayList<>();
-        for (int i = 1; i <= 200; i++) {
+        for (int i = 1; i <= 10; i++) {
             Member member = Member.builder()
                     .email("member" + i + "@gmail.com")
                     .nickname("member" + i)
@@ -339,15 +355,23 @@ class MemberControllerTest {
         LoginMemberResponse loginMemberResponse = toObject(mvcResult, LoginMemberResponse.class);
 
         //회원 조회.
-        mockMvc.perform(get("/api/members?page=1&size=5&sortBy=id&direction=ASC")
+        MemberSearchRequest memberSearchRequest = new MemberSearchRequest();
+        memberSearchRequest.setSortBy("id");
+        memberSearchRequest.setPage(0);
+        memberSearchRequest.setSize(5);
+        memberSearchRequest.setDirection(Sort.Direction.fromString("ASC"));
+
+        mockMvc.perform(get("/api/members")
+                        .param("page", String.valueOf(memberSearchRequest.getPage()))
+                        .param("size", String.valueOf(memberSearchRequest.getSize()))
+                        .param("sortBy", memberSearchRequest.getSortBy())
+                        .param("direction", String.valueOf(memberSearchRequest.getDirection()))
                         .header("Authorization", "Bearer " + loginMemberResponse.getJwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(5))
                 .andExpect(jsonPath("$[0].memberId").value(1))
                 .andExpect(jsonPath("$[4].memberId").value(5))
-                .andDo(print())
-                .andReturn();
-
+                .andDo(print());
     }
 
     /* util */
