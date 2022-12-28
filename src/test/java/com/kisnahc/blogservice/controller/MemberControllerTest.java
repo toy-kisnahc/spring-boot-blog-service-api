@@ -312,39 +312,8 @@ class MemberControllerTest {
                 .andDo(print());
     }
 
-//    @Test
-//    void find_members_test() throws Exception{
-//        // 10명 회원 가입.
-//        List<CreateMemberRequest> createMembers = new ArrayList<>();
-//        for (int i = 1; i < 10; i++) {
-//            createMembers.add(createMember("member" + i + "@gmail.com", "member" + i, "member1234!"));
-//        }
-//
-//        // 로그인.
-//        LoginMemberRequest loginRequest = getLoginMemberRequest(createMembers.get(0).getEmail(), createMembers.get(0).getPassword());
-//        String loginRequestBody = toBody(loginRequest);
-//        MvcResult mvcResult = mockMvc.perform(post("/api/auth/sign-in")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(loginRequestBody))
-//                .andExpect(status().isOk())
-//                .andDo(print())
-//                .andReturn();
-//
-//        LoginMemberResponse loginMemberResponse = toObject(mvcResult, LoginMemberResponse.class);
-//
-//        //회원 조회.
-//        MvcResult result = mockMvc.perform(get("/api/members")
-//                        .header("Authorization", "Bearer " + loginMemberResponse.getJwt()))
-//                .andExpect(status().isOk())
-//                .andDo(print())
-//                .andReturn();
-//        List<MemberResponse> memberResponse = toObject(result, new ArrayList<MemberResponse>().getClass());
-//
-//        Assertions.assertThat(createMembers.size()).isEqualTo(memberResponse.size());
-//    }
-
     @Test
-    void find_members_pagination_test() throws Exception{
+    void find_member_dynamic_sorting_test() throws Exception{
         // 200명 회원 가입.
         List<Member> members = new ArrayList<>();
         for (int i = 1; i <= 200; i++) {
@@ -370,12 +339,12 @@ class MemberControllerTest {
         LoginMemberResponse loginMemberResponse = toObject(mvcResult, LoginMemberResponse.class);
 
         //회원 조회.
-        mockMvc.perform(get("/api/members?page=0&size=20")
+        mockMvc.perform(get("/api/members?page=1&size=5&sortBy=id&direction=ASC")
                         .header("Authorization", "Bearer " + loginMemberResponse.getJwt()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(20))
-                .andExpect(jsonPath("$[0].memberId").value(200))
-                .andExpect(jsonPath("$[19].memberId").value(181))
+                .andExpect(jsonPath("$.length()").value(5))
+                .andExpect(jsonPath("$[0].memberId").value(1))
+                .andExpect(jsonPath("$[4].memberId").value(5))
                 .andDo(print())
                 .andReturn();
 
@@ -427,4 +396,72 @@ class MemberControllerTest {
         return updateMemberRequest;
     }
 
+//    @Test
+//    void find_members_test() throws Exception{
+//        // 10명 회원 가입.
+//        List<CreateMemberRequest> createMembers = new ArrayList<>();
+//        for (int i = 1; i < 10; i++) {
+//            createMembers.add(createMember("member" + i + "@gmail.com", "member" + i, "member1234!"));
+//        }
+//
+//        // 로그인.
+//        LoginMemberRequest loginRequest = getLoginMemberRequest(createMembers.get(0).getEmail(), createMembers.get(0).getPassword());
+//        String loginRequestBody = toBody(loginRequest);
+//        MvcResult mvcResult = mockMvc.perform(post("/api/auth/sign-in")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(loginRequestBody))
+//                .andExpect(status().isOk())
+//                .andDo(print())
+//                .andReturn();
+//
+//        LoginMemberResponse loginMemberResponse = toObject(mvcResult, LoginMemberResponse.class);
+//
+//        //회원 조회.
+//        MvcResult result = mockMvc.perform(get("/api/members")
+//                        .header("Authorization", "Bearer " + loginMemberResponse.getJwt()))
+//                .andExpect(status().isOk())
+//                .andDo(print())
+//                .andReturn();
+//        List<MemberResponse> memberResponse = toObject(result, new ArrayList<MemberResponse>().getClass());
+//
+//        Assertions.assertThat(createMembers.size()).isEqualTo(memberResponse.size());
+//    }
+
+//    @Test
+//    void find_members_pagination_test() throws Exception{
+//        // 200명 회원 가입.
+//        List<Member> members = new ArrayList<>();
+//        for (int i = 1; i <= 200; i++) {
+//            Member member = Member.builder()
+//                    .email("member" + i + "@gmail.com")
+//                    .nickname("member" + i)
+//                    .role(Role.ROLE_MEMBER)
+//                    .password(passwordEncoder.encode("Member1234!"))
+//                    .build();
+//            members.add(member);
+//        }
+//        memberRepository.saveAll(members);
+//
+//        // 로그인.
+//        LoginMemberRequest loginRequest = getLoginMemberRequest(members.get(0).getEmail(), "Member1234!");
+//        String loginRequestBody = toBody(loginRequest);
+//        MvcResult mvcResult = mockMvc.perform(post("/api/auth/sign-in")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(loginRequestBody))
+//                .andExpect(status().isOk())
+//                .andReturn();
+//
+//        LoginMemberResponse loginMemberResponse = toObject(mvcResult, LoginMemberResponse.class);
+//
+//        //회원 조회.
+//        mockMvc.perform(get("/api/members?page=0&size=20")
+//                        .header("Authorization", "Bearer " + loginMemberResponse.getJwt()))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.length()").value(20))
+//                .andExpect(jsonPath("$[0].memberId").value(200))
+//                .andExpect(jsonPath("$[19].memberId").value(181))
+//                .andDo(print())
+//                .andReturn();
+//
+//    }
 }
