@@ -5,6 +5,7 @@ import com.kisnahc.blogservice.dto.response.MemberResponse;
 import com.kisnahc.blogservice.dto.response.QMemberResponse;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -21,15 +22,21 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<MemberResponse> getMembers(MemberSearchRequest searchRequest) {
+    public List<MemberResponse> getMembers(MemberSearchRequest memberSearchRequest) {
 
         return jpaQueryFactory
                 .select(new QMemberResponse(member))
                 .from(member)
-                .offset(searchRequest.getOffset())
-                .limit(searchRequest.getSize())
-                .orderBy(memberSort(searchRequest))
+                .where(nicknameContains(memberSearchRequest))
+                .offset(memberSearchRequest.getOffset())
+                .limit(memberSearchRequest.getSize())
+                .orderBy(memberSort(memberSearchRequest))
                 .fetch();
+    }
+
+    private BooleanExpression nicknameContains(MemberSearchRequest memberSearchRequest) {
+        return memberSearchRequest.getNicknameContains() != null ?
+                member.nickname.contains(memberSearchRequest.getNicknameContains()) : null;
     }
 
     private OrderSpecifier<?> memberSort(MemberSearchRequest memberSearchRequest) {
