@@ -357,7 +357,7 @@ class MemberControllerTest {
         //회원 조회.
         MemberSearchRequest memberSearchRequest = new MemberSearchRequest();
         memberSearchRequest.setSortBy("id");
-        memberSearchRequest.setPage(0);
+        memberSearchRequest.setPage(1);
         memberSearchRequest.setSize(5);
         memberSearchRequest.setDirection(Sort.Direction.fromString("ASC"));
 
@@ -371,6 +371,54 @@ class MemberControllerTest {
                 .andExpect(jsonPath("$.length()").value(5))
                 .andExpect(jsonPath("$[0].memberId").value(1))
                 .andExpect(jsonPath("$[4].memberId").value(5))
+                .andDo(print());
+    }
+
+    @Test
+    void find_members_dynamic_query_test() throws Exception{
+        // 10명 회원 가입.
+        List<Member> members = new ArrayList<>();
+        for (int i = 1; i <= 10; i++) {
+            Member member = Member.builder()
+                    .email("member" + i + "@gmail.com")
+                    .nickname("member" + i)
+                    .role(Role.ROLE_MEMBER)
+                    .password(passwordEncoder.encode("Member1234!"))
+                    .build();
+            members.add(member);
+        }
+        memberRepository.saveAll(members);
+
+        // 로그인.
+        LoginMemberRequest loginRequest = getLoginMemberRequest(members.get(0).getEmail(), "Member1234!");
+        String loginRequestBody = toBody(loginRequest);
+        MvcResult mvcResult = mockMvc.perform(post("/api/auth/sign-in")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginRequestBody))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        LoginMemberResponse loginMemberResponse = toObject(mvcResult, LoginMemberResponse.class);
+
+        //회원 조회.
+        MemberSearchRequest memberSearchRequest = new MemberSearchRequest();
+        memberSearchRequest.setSortBy("id");
+        memberSearchRequest.setPage(1);
+        memberSearchRequest.setSize(5);
+        memberSearchRequest.setNicknameContains("1");
+        memberSearchRequest.setDirection(Sort.Direction.fromString("ASC"));
+
+        mockMvc.perform(get("/api/members")
+                        .param("page", String.valueOf(memberSearchRequest.getPage()))
+                        .param("size", String.valueOf(memberSearchRequest.getSize()))
+                        .param("sortBy", memberSearchRequest.getSortBy())
+                        .param("direction", String.valueOf(memberSearchRequest.getDirection()))
+                        .param("nicknameContains", memberSearchRequest.getNicknameContains())
+                        .header("Authorization", "Bearer " + loginMemberResponse.getJwt()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].memberId").value(1))
+                .andExpect(jsonPath("$[1].memberId").value(10))
                 .andDo(print());
     }
 
