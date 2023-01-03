@@ -11,8 +11,9 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Member extends BaseTimeEntity{
 
-    @Id
+    @Column(name = "member_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     private Long id;
 
     @Column(unique = true, nullable = false)

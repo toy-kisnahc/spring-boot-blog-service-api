@@ -57,7 +57,7 @@ class MemberControllerTest {
     void init() {
         memberRepository.deleteAll();
         this.entityManager
-                .createNativeQuery("ALTER TABLE member ALTER COLUMN `id` RESTART WITH 1")
+                .createNativeQuery("alter table member alter column `member_id` restart with 1")
                 .executeUpdate();
     }
 
