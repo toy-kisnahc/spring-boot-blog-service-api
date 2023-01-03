@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-public class Post {
+public class Post extends BaseTimeEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,6 +32,10 @@ public class Post {
         this.author = author;
         this.title = title;
         this.content = content;
+    }
+
+    public void updateViewCount() {
+        view++;
     }
 
 }
