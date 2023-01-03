@@ -1,6 +1,7 @@
 package com.kisnahc.blogservice.auth.provider;
 
 import com.kisnahc.blogservice.auth.CustomUserDetailService;
+import com.kisnahc.blogservice.auth.MemberAdapter;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -13,7 +14,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Base64;
@@ -62,7 +62,7 @@ public class JwtProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        UserDetails userDetail = customUserDetailService.loadUserByUsername(getEmail(token));
+        MemberAdapter userDetail = customUserDetailService.loadUserByUsername(getEmail(token));
         return new UsernamePasswordAuthenticationToken(userDetail, "", userDetail.getAuthorities());
     }
 
