@@ -1,4 +1,4 @@
-package com.kisnahc.blogservice.dto.reqeust;
+package com.kisnahc.blogservice.dto.reqeust.member;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

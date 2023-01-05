@@ -6,11 +6,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
 public class Post extends BaseTimeEntity{
 
+    @Column(name = "post_id")
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -23,6 +27,9 @@ public class Post extends BaseTimeEntity{
     
     @Column(nullable = false)
     private String content;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
 
     @Column(nullable = false, columnDefinition = "integer default 0")
     private int view;

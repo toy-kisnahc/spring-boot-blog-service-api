@@ -1,4 +1,4 @@
-package com.kisnahc.blogservice.dto.response;
+package com.kisnahc.blogservice.dto.response.post;
 
 import com.kisnahc.blogservice.domain.Member;
 import com.kisnahc.blogservice.domain.Post;

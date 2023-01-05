@@ -1,4 +1,4 @@
-package com.kisnahc.blogservice.dto.response;
+package com.kisnahc.blogservice.dto.response.member;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

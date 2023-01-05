@@ -2,11 +2,11 @@ package com.kisnahc.blogservice.service;
 
 import com.kisnahc.blogservice.auth.MemberAdapter;
 import com.kisnahc.blogservice.domain.Post;
-import com.kisnahc.blogservice.dto.reqeust.CreatePostRequest;
-import com.kisnahc.blogservice.dto.response.CreatePostResponse;
-import com.kisnahc.blogservice.dto.response.PostResponse;
+import com.kisnahc.blogservice.dto.reqeust.post.CreatePostRequest;
+import com.kisnahc.blogservice.dto.response.post.CreatePostResponse;
+import com.kisnahc.blogservice.dto.response.post.PostWithCommentResponse;
 import com.kisnahc.blogservice.exception.post.PostNotFoundException;
-import com.kisnahc.blogservice.repository.PostRepository;
+import com.kisnahc.blogservice.repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,9 +32,8 @@ public class PostService {
         return new CreatePostResponse(savedPost, savedPost.getAuthor());
     }
 
-    public PostResponse getPost(Long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        return new PostResponse(post);
+    public PostWithCommentResponse getPostWithComment(Long postId) {
+        return postRepository.findOneById(postId).orElseThrow(PostNotFoundException::new);
     }
 
     @Transactional

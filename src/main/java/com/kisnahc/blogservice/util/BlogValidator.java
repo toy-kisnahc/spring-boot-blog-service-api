@@ -1,12 +1,14 @@
 package com.kisnahc.blogservice.util;
 
+import com.kisnahc.blogservice.domain.Comment;
 import com.kisnahc.blogservice.domain.Member;
-import com.kisnahc.blogservice.dto.reqeust.CreateMemberRequest;
-import com.kisnahc.blogservice.dto.reqeust.LoginMemberRequest;
+import com.kisnahc.blogservice.dto.reqeust.member.CreateMemberRequest;
+import com.kisnahc.blogservice.dto.reqeust.member.LoginMemberRequest;
+import com.kisnahc.blogservice.exception.comment.CommentInvalidException;
 import com.kisnahc.blogservice.exception.member.DuplicateEmailException;
 import com.kisnahc.blogservice.exception.member.DuplicateNicknameException;
 import com.kisnahc.blogservice.exception.member.LoginFailedException;
-import com.kisnahc.blogservice.repository.MemberRepository;
+import com.kisnahc.blogservice.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -36,5 +38,11 @@ public class BlogValidator {
             throw new LoginFailedException();
         }
         return member;
+    }
+
+    public void validateSamePost(Long postId, Comment comment) {
+        if (!comment.getPost().getId().equals(postId)) {
+            throw new CommentInvalidException();
+        }
     }
 }

@@ -2,10 +2,15 @@ package com.kisnahc.blogservice.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kisnahc.blogservice.dto.reqeust.CreateMemberRequest;
-import com.kisnahc.blogservice.dto.reqeust.CreatePostRequest;
-import com.kisnahc.blogservice.dto.reqeust.LoginMemberRequest;
-import com.kisnahc.blogservice.dto.response.LoginMemberResponse;
+import com.kisnahc.blogservice.dto.reqeust.member.CreateMemberRequest;
+import com.kisnahc.blogservice.dto.reqeust.post.CreatePostRequest;
+import com.kisnahc.blogservice.dto.reqeust.member.LoginMemberRequest;
+import com.kisnahc.blogservice.dto.response.member.LoginMemberResponse;
+import com.kisnahc.blogservice.repository.member.MemberRepository;
+import com.kisnahc.blogservice.repository.post.PostRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -31,6 +36,23 @@ class PostControllerTest {
     @Autowired
     MockMvc mockMvc;
 
+    @Autowired
+    PostRepository postRepository;
+
+    @Autowired
+    MemberRepository memberRepository;
+
+    @PersistenceContext
+    EntityManager entityManager;
+
+    @AfterEach
+    void init() {
+        postRepository.deleteAll();
+        this.entityManager
+                .createNativeQuery("alter table post alter column `post_id` restart with 1")
+                .executeUpdate();
+    }
+
     @Test
     void create_post_test_success() throws Exception {
         // 회원가입 및 로그인.
@@ -54,7 +76,7 @@ class PostControllerTest {
                         .header("Authorization", "Bearer " + loginMemberResponse.getJwt()))
                 .andExpect((jsonPath("$.author")).value("memberA"))
                 .andExpect((jsonPath("$.title")).value("게시글 제목"))
-                .andExpect((jsonPath("$.content")).value("게시글 내"))
+                .andExpect((jsonPath("$.content")).value("게시글 내용"))
                 .andDo(print());
     }
 

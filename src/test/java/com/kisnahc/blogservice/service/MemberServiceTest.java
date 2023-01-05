@@ -1,8 +1,8 @@
 package com.kisnahc.blogservice.service;
 
 import com.kisnahc.blogservice.domain.Member;
-import com.kisnahc.blogservice.dto.reqeust.CreateMemberRequest;
-import com.kisnahc.blogservice.repository.MemberRepository;
+import com.kisnahc.blogservice.dto.reqeust.member.CreateMemberRequest;
+import com.kisnahc.blogservice.repository.member.MemberRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

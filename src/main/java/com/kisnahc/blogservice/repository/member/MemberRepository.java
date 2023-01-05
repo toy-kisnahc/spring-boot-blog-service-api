@@ -1,4 +1,4 @@
-package com.kisnahc.blogservice.repository;
+package com.kisnahc.blogservice.repository.member;
 
 import com.kisnahc.blogservice.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;

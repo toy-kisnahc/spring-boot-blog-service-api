@@ -49,6 +49,9 @@ dependencies {
     // JWT
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
 
+    // p6spy
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0'
+
 
     // jdk11에서 제외 됨 -> ClassNotFoundException(javax.xml.bind.DatatypeConverter)
     implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'

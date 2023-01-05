@@ -1,9 +1,9 @@
 package com.kisnahc.blogservice.controller;
 
 import com.kisnahc.blogservice.auth.MemberAdapter;
-import com.kisnahc.blogservice.dto.reqeust.CreatePostRequest;
-import com.kisnahc.blogservice.dto.response.CreatePostResponse;
-import com.kisnahc.blogservice.dto.response.PostResponse;
+import com.kisnahc.blogservice.dto.reqeust.post.CreatePostRequest;
+import com.kisnahc.blogservice.dto.response.post.CreatePostResponse;
+import com.kisnahc.blogservice.dto.response.post.PostWithCommentResponse;
 import com.kisnahc.blogservice.service.PostService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,11 +29,11 @@ public class PostController {
     }
 
     @GetMapping("/api/posts/{postId}")
-    public ResponseEntity<PostResponse> findPost(@PathVariable Long postId,
-                                                 HttpServletRequest request,
-                                                 HttpServletResponse response) {
+    public ResponseEntity<PostWithCommentResponse> findPost(@PathVariable Long postId,
+                                                            HttpServletRequest request,
+                                                            HttpServletResponse response) {
         abusingViewCount(postId, request, response);
-        PostResponse postResponse = postService.getPost(postId);
+        PostWithCommentResponse postResponse = postService.getPostWithComment(postId);
         return new ResponseEntity<>(postResponse, HttpStatus.OK);
     }
 

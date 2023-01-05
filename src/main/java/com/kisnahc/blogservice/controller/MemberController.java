@@ -1,8 +1,9 @@
 package com.kisnahc.blogservice.controller;
 
 import com.kisnahc.blogservice.auth.MemberAdapter;
-import com.kisnahc.blogservice.dto.reqeust.*;
-import com.kisnahc.blogservice.dto.response.*;
+import com.kisnahc.blogservice.dto.reqeust.member.*;
+import com.kisnahc.blogservice.dto.response.member.*;
+import com.kisnahc.blogservice.dto.response.member.UpdateMemberResponse;
 import com.kisnahc.blogservice.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

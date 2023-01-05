@@ -7,7 +7,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        show_sql: true
         dialect: org.hibernate.dialect.H2Dialect
 
   datasource:
@@ -16,3 +15,5 @@ spring:
     password:
     url: jdbc:h2:tcp://localhost/~/blog_test_db
 
+logging.level:
+  org.hibernate.SQL: debug

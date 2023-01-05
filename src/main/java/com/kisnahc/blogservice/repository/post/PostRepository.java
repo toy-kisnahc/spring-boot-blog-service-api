@@ -1,4 +1,4 @@
-package com.kisnahc.blogservice.repository;
+package com.kisnahc.blogservice.repository.post;
 
 import com.kisnahc.blogservice.domain.Post;
 import jakarta.persistence.LockModeType;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface PostRepository extends JpaRepository<Post, Long> {
+public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryCustom {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT p FROM Post p WHERE p.id = :postId")

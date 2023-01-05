@@ -1,4 +1,4 @@
-package com.kisnahc.blogservice.dto.reqeust;
+package com.kisnahc.blogservice.dto.reqeust.post;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
