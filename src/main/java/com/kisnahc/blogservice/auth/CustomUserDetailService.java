@@ -2,7 +2,7 @@ package com.kisnahc.blogservice.auth;
 
 import com.kisnahc.blogservice.domain.Member;
 
-import com.kisnahc.blogservice.repository.MemberRepository;
+import com.kisnahc.blogservice.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

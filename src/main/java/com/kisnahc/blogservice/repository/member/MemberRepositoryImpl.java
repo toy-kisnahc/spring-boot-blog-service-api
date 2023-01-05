@@ -1,8 +1,8 @@
-package com.kisnahc.blogservice.repository;
+package com.kisnahc.blogservice.repository.member;
 
-import com.kisnahc.blogservice.dto.reqeust.MemberSearchRequest;
-import com.kisnahc.blogservice.dto.response.MemberResponse;
-import com.kisnahc.blogservice.dto.response.QMemberResponse;
+import com.kisnahc.blogservice.dto.reqeust.member.MemberSearchRequest;
+import com.kisnahc.blogservice.dto.response.member.QMemberResponse;
+import com.kisnahc.blogservice.dto.response.member.MemberResponse;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -23,7 +23,6 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 
     @Override
     public List<MemberResponse> getMembers(MemberSearchRequest memberSearchRequest) {
-
         return jpaQueryFactory
                 .select(new QMemberResponse(member))
                 .from(member)

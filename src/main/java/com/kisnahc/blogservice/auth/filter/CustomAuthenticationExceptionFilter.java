@@ -30,6 +30,7 @@ public class CustomAuthenticationExceptionFilter extends OncePerRequestFilter {
         body.put("status", String.valueOf(HttpServletResponse.SC_UNAUTHORIZED));
         body.put("error", "unauthorized");
         body.put("message", e.getMessage());
+        body.put("cause", String.valueOf(e.getCause()));
 
 
         ObjectMapper objectMapper = new ObjectMapper();
